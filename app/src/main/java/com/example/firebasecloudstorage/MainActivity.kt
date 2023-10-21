@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,77 +35,41 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.firebasecloudstorage.ui.theme.FireBaseCloudStorageTheme
+import com.example.firebasecloudstorage.ui.uploadImageScreen.UploadFileViewModel
+import com.example.firebasecloudstorage.ui.uploadImageScreen.UploadImageScreen
+import com.example.firebasecloudstorage.ui.uploadImageScreen.UploadImageUiState
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             FireBaseCloudStorageTheme {
                 // A surface container using the 'background' color from the theme
+                val viewModel: UploadFileViewModel = viewModel()
+                val uploadFileState by viewModel.uploadFileStatus.collectAsStateWithLifecycle()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    UploadImageScreen()
+                    UploadImageScreen(uploadFileState, uploadImage = { uri, fileName ->
+                        viewModel.uploadFile(fileName, uri)
+                    })
                 }
             }
         }
     }
 }
 
-@Composable
-fun UploadImageScreen() {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var bitmap by  remember { mutableStateOf<Bitmap?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-        imageUri = it
-    }
-
-    imageUri?.let {
-        bitmap = if (Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images
-                .Media.getBitmap(context.contentResolver, it)
-
-        } else {
-            val source = ImageDecoder
-                .createSource(context.contentResolver, it)
-            ImageDecoder.decodeBitmap(source)
-        }
-    }
-
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-                bitmap?.asImageBitmap()?.let { it1 ->
-                    Image(
-                        bitmap = it1,
-                        contentDescription = "search",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .clickable {
-                                launcher.launch("image/*")
-                            }
-                    )
-                }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Button(onClick = {  launcher.launch("image/*") }) {
-                Text(text = "Select Image")
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     FireBaseCloudStorageTheme {
-        UploadImageScreen()
+        //UploadImageScreen()
     }
 }
