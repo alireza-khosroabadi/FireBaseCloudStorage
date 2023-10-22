@@ -11,17 +11,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class UploadStatus { SUCCESS, FAILED }
+
 sealed class UploadImageUiState {
     data object Initialize : UploadImageUiState()
     data object Loading : UploadImageUiState()
-    data class ImageUploadedSuccess(val message: String) : UploadImageUiState()
-    data class ImageUploadFailed(val message: String) : UploadImageUiState()
+    data class ImageUploaded(val message: String, val status: UploadStatus) : UploadImageUiState()
 }
 
 @HiltViewModel
 class UploadFileViewModel @Inject constructor(private val uploadImage: UploadImage) : ViewModel() {
 
-    private val _uploadFileState = MutableStateFlow<UploadImageUiState>(UploadImageUiState.Initialize)
+    private val _uploadFileState =
+        MutableStateFlow<UploadImageUiState>(UploadImageUiState.Initialize)
     val uploadFileStatus = _uploadFileState.asStateFlow()
 
 
@@ -31,10 +33,16 @@ class UploadFileViewModel @Inject constructor(private val uploadImage: UploadIma
             val uploadResult = uploadImage.uploadImage(uri, fileName)
             if (uploadResult is DataModel.Success)
                 _uploadFileState.value =
-                    UploadImageUiState.ImageUploadedSuccess(uploadResult.data.message)
+                    UploadImageUiState.ImageUploaded(
+                        uploadResult.data.message,
+                        UploadStatus.SUCCESS
+                    )
             else if (uploadResult is DataModel.Error)
                 _uploadFileState.value =
-                    UploadImageUiState.ImageUploadFailed(uploadResult.error.errorMessage)
+                    UploadImageUiState.ImageUploaded(
+                        uploadResult.error.errorMessage,
+                        UploadStatus.FAILED
+                    )
         }
     }
 
