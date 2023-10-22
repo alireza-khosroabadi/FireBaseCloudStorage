@@ -3,7 +3,7 @@ package com.example.firebasecloudstorage.ui.uploadImageScreen
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.firebasecloudstorage.data.dataStore.UploadImage
+import com.example.firebasecloudstorage.data.uploadImage.UploadImage
 import com.example.firebasecloudstorage.data.model.baseModel.DataModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

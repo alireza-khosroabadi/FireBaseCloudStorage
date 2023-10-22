@@ -68,9 +68,11 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.firebase.storage)
     implementation(libs.dagger.hilt)
+    implementation(libs.navigation.compose.hilt)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.navigation.compose)
+    implementation(libs.coil)
 
     kapt(libs.dagger.hilt.compiler)
 

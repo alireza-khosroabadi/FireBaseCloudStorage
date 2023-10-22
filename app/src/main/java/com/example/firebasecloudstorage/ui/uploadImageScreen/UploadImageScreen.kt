@@ -49,11 +49,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun UploadImageScreen(
     uploadImageState: UploadImageUiState,
+    onNavigateBack: () -> Unit,
+    snackbarHostState : SnackbarHostState = remember { SnackbarHostState() },
     uploadImage: (uri: Uri, fileName: String) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
@@ -72,17 +73,10 @@ fun UploadImageScreen(
         }
     }
 
-
-    Scaffold(
-        modifier = Modifier,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { contentPadding ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(15.dp)
-                .padding(contentPadding)
         ) {
             Box(
                 modifier = Modifier
@@ -138,7 +132,6 @@ fun UploadImageScreen(
                             Text(text = "Upload Image")
                         }
                     }
-                }
             }
         }
     }
