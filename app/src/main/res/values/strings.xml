@@ -3,4 +3,8 @@
     <string name="screen_title_image_list">My Images</string>
     <string name="screen_title_upload_image">Upload Image</string>
     <string name="back_button">back button</string>
+    <string name="delete_dialog_confirm_btn">Delete</string>
+    <string name="delete_dialog_cancle_btn">Cancle</string>
+    <string name="delete_dialog_title">Delete Image</string>
+    <string name="delete_dialog_Body">Are you surre to delete this image?</string>
 </resources>

@@ -3,7 +3,7 @@ package com.example.firebasecloudstorage.ui.uploadImageScreen
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.firebasecloudstorage.data.uploadImage.UploadImage
+import com.example.firebasecloudstorage.data.repository.uploadImage.UploadImageRepository
 import com.example.firebasecloudstorage.data.model.baseModel.DataModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ sealed class UploadImageUiState {
 }
 
 @HiltViewModel
-class UploadFileViewModel @Inject constructor(private val uploadImage: UploadImage) : ViewModel() {
+class UploadFileViewModel @Inject constructor(private val uploadImageRepository: UploadImageRepository) : ViewModel() {
 
     private val _uploadFileState =
         MutableStateFlow<UploadImageUiState>(UploadImageUiState.Initialize)
@@ -30,7 +30,7 @@ class UploadFileViewModel @Inject constructor(private val uploadImage: UploadIma
     fun uploadFile(fileName: String, uri: Uri) {
         viewModelScope.launch {
             _uploadFileState.value = UploadImageUiState.Loading
-            val uploadResult = uploadImage.uploadImage(uri, fileName)
+            val uploadResult = uploadImageRepository.uploadImage(uri, fileName)
             if (uploadResult is DataModel.Success)
                 _uploadFileState.value =
                     UploadImageUiState.ImageUploaded(

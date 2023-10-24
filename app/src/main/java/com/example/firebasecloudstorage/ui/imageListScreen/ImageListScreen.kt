@@ -1,5 +1,7 @@
 package com.example.firebasecloudstorage.ui.imageListScreen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,20 +21,36 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.firebasecloudstorage.R
+import com.example.firebasecloudstorage.data.model.image.ImageModel
+import com.example.firebasecloudstorage.ui.base.AppAlertDialog
 
 
 @Composable
-fun ImageListScreen(imageListState: ImageListState, onNavigateToUploadImage: () -> Unit, reloadImages: () -> Unit) {
+fun ImageListScreen(
+    imageListState: ImageListState,
+    onNavigateToUploadImage: () -> Unit,
+    onNavigateToFullScreenImage: (imageUrl: String) -> Unit,
+    reloadImages: () -> Unit,
+    onDeleteItemClick: (imageName: String) -> Unit
+) {
     when (imageListState) {
         ImageListState.EmptyList -> EmptyList(onNavigateToUploadImage)
         is ImageListState.Error -> ShowError(error = imageListState, reloadImages)
         is ImageListState.ImageList -> ShowImageList(
             imageList = imageListState.data,
-            onNavigateToUploadImage
+            onNavigateToUploadImage,
+            onDeleteItemClick,
+            onNavigateToFullScreenImage
         )
 
         ImageListState.Loading -> ImageListLoading()
@@ -88,16 +106,31 @@ fun ShowError(error: ImageListState.Error, reloadImages: () -> Unit) {
 }
 
 @Composable
-fun ShowImageList(imageList: List<String>, onNavigateToUploadImage: () -> Unit) {
+fun ShowImageList(
+    imageList: List<ImageModel>,
+    onNavigateToUploadImage: () -> Unit,
+    onDeleteItemClick: (imageName: String) -> Unit,
+    onNavigateToFullScreenImage: (imageUrl: String) -> Unit
+) {
+    var dialogState by remember { mutableStateOf(false) }
+    var selectedImageToDelete by remember {
+        mutableStateOf<String?>(null)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Fixed(2)) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            verticalItemSpacing = 4.dp,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             items(imageList,
-                key = { it }) {
-                AsyncImage(
-                    modifier = Modifier.padding(8.dp),
-                    model = it,
-                    contentDescription = null,
-                )
+                key = { it.imageName }) {
+                ImageItem(it, onItemLongClick = {
+                    dialogState = true
+                    selectedImageToDelete = it.imageName
+                }) {
+                    onNavigateToFullScreenImage(it.imageUrl)
+                }
             }
         }
 
@@ -111,4 +144,38 @@ fun ShowImageList(imageList: List<String>, onNavigateToUploadImage: () -> Unit) 
             Icon(Icons.Filled.Add, contentDescription = "Add Button")
         }
     }
+
+    if (dialogState) {
+        AppAlertDialog(
+            onConfirmation = {
+                dialogState = false
+                selectedImageToDelete?.let { onDeleteItemClick(it) }
+                selectedImageToDelete = null
+            },
+            onDismiss = {
+                dialogState = false
+                selectedImageToDelete = null
+            },
+            confirmBtnText = stringResource(id = R.string.delete_dialog_confirm_btn),
+            dismissBtnText = stringResource(id = R.string.delete_dialog_cancle_btn),
+            title = stringResource(id = R.string.delete_dialog_title),
+            body = stringResource(id = R.string.delete_dialog_Body)
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ImageItem(it: ImageModel, onItemLongClick: () -> Unit, onItemClick: () -> Unit) {
+
+    AsyncImage(
+        modifier = Modifier
+            .padding(8.dp)
+            .combinedClickable(
+                onClick = onItemClick,
+                onLongClick = onItemLongClick
+            ),
+        model = it.imageUrl,
+        contentDescription = null
+    )
 }

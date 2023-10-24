@@ -12,13 +12,12 @@ import com.example.firebasecloudstorage.ui.home.ScreenRouts
 import com.example.firebasecloudstorage.ui.uploadImageScreen.UploadFileViewModel
 import com.example.firebasecloudstorage.ui.uploadImageScreen.UploadImageScreen
 
-fun NavGraphBuilder.uploadImage(snackbarHostState: SnackbarHostState, onNavigateBack: () -> Unit) {
-    composable(ScreenRouts.UploadImage.name) {
+fun NavGraphBuilder.uploadImage(snackbarHostState: SnackbarHostState) {
+    composable(ScreenRouts.UploadImage.rout) {
         val viewModel = hiltViewModel<UploadFileViewModel>()
         val uploadFileState by viewModel.uploadFileStatus.collectAsStateWithLifecycle()
         UploadImageScreen(
             uploadImageState = uploadFileState,
-            onNavigateBack = onNavigateBack,
             snackbarHostState= snackbarHostState) { uri, fileName ->
             viewModel.uploadFile(fileName, uri)
         }
@@ -26,5 +25,5 @@ fun NavGraphBuilder.uploadImage(snackbarHostState: SnackbarHostState, onNavigate
 }
 
 fun NavController.navigateToUploadImage() {
-    this.navigate(ScreenRouts.UploadImage.name)
+    this.navigate(ScreenRouts.UploadImage.rout)
 }

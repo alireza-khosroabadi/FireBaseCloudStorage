@@ -21,9 +21,9 @@ fun HomeAppScreen(navController: NavHostController = rememberNavController()) {
     // Get current back stack entry
     val backStackEntry by navController.currentBackStackEntryAsState()
     // Get the name of the current screen
-    val currentScreen = ScreenRouts.valueOf(
-        backStackEntry?.destination?.route ?: ScreenRouts.ImageList.name
-    )
+    val currentScreen = ScreenRouts.findByRout(
+        backStackEntry?.destination?.route ?: ScreenRouts.ImageList.rout
+    )?: ScreenRouts.ImageList
     val snackbarHostState : SnackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(

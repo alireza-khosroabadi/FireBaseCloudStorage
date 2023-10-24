@@ -1,4 +1,4 @@
-package com.example.firebasecloudstorage.data.uploadImage
+package com.example.firebasecloudstorage.data.repository.uploadImage
 
 import android.net.Uri
 import com.example.firebasecloudstorage.data.model.baseModel.DataModel
@@ -8,8 +8,8 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class UploadImageFirebaseStorage @Inject constructor(private val storageReference: StorageReference) :
-    UploadImage {
+class UploadImageRepositoryImpl @Inject constructor(private val storageReference: StorageReference) :
+    UploadImageRepository {
     override suspend fun uploadImage(uri: Uri, fileName: String): DataModel<UploadImageResponse> {
         return try {
             storageReference.child("images/$fileName").putFile(uri).await()

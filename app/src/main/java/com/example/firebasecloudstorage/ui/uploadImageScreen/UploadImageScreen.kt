@@ -49,7 +49,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun UploadImageScreen(
     uploadImageState: UploadImageUiState,
-    onNavigateBack: () -> Unit,
     snackbarHostState : SnackbarHostState = remember { SnackbarHostState() },
     uploadImage: (uri: Uri, fileName: String) -> Unit
 ) {
